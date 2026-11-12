@@ -786,19 +786,24 @@ async function main() {
     });
 
     for (const [index, lesson] of week.lessons.entries()) {
-      await prisma.lesson.create({
-        data: {
-          weekId: createdWeek.id,
-          dayNumber: lesson.dayNumber,
-          title: lesson.title,
-          objectives: lesson.objectives,
-          sentencePatterns: lesson.sentencePatterns,
-          vocabList: lesson.vocabList,
-          guidedSpeakingPrompts: lesson.guidedSpeakingPrompts,
-          dialogueScript: lesson.dialogueScript,
-          orderIndex: index
-        }
+      const existingLesson = await prisma.lesson.findFirst({
+        where: { weekId: createdWeek.id, dayNumber: lesson.dayNumber }
       });
+      if (!existingLesson) {
+        await prisma.lesson.create({
+          data: {
+            weekId: createdWeek.id,
+            dayNumber: lesson.dayNumber,
+            title: lesson.title,
+            objectives: lesson.objectives,
+            sentencePatterns: lesson.sentencePatterns,
+            vocabList: lesson.vocabList,
+            guidedSpeakingPrompts: lesson.guidedSpeakingPrompts,
+            dialogueScript: lesson.dialogueScript,
+            orderIndex: index
+          }
+        });
+      }
     }
   }
   console.log('Curriculum (7 weeks & 35 lessons) successfully seeded.');
@@ -1164,9 +1169,14 @@ async function main() {
   ];
 
   for (const ex of listeningExercises) {
-    await prisma.listeningExercise.create({
-      data: ex
+    const existing = await prisma.listeningExercise.findFirst({
+      where: { title: ex.title }
     });
+    if (!existing) {
+      await prisma.listeningExercise.create({
+        data: ex
+      });
+    }
   }
   console.log(`Listening exercises (20 curated dialogues) seeded successfully.`);
 
@@ -1295,22 +1305,27 @@ async function main() {
   ];
 
   for (const v of vocabItems) {
-    await prisma.vocabularyItem.create({
-      data: {
-        userId: user.id,
-        phrase: v.phrase,
-        translation: v.translation,
-        exampleSentence: v.exampleSentence,
-        context: v.context,
-        topic: v.topic,
-        difficulty: v.difficulty,
-        masteryLevel: 1,
-        intervalDays: 1,
-        easeFactor: 2.5,
-        repetitions: 1,
-        nextReviewDate: new Date()
-      }
+    const existing = await prisma.vocabularyItem.findFirst({
+      where: { userId: user.id, phrase: v.phrase }
     });
+    if (!existing) {
+      await prisma.vocabularyItem.create({
+        data: {
+          userId: user.id,
+          phrase: v.phrase,
+          translation: v.translation,
+          exampleSentence: v.exampleSentence,
+          context: v.context,
+          topic: v.topic,
+          difficulty: v.difficulty,
+          masteryLevel: 1,
+          intervalDays: 1,
+          easeFactor: 2.5,
+          repetitions: 1,
+          nextReviewDate: new Date()
+        }
+      });
+    }
   }
   console.log(`Vocabulary items seeded successfully.`);
 
@@ -1331,43 +1346,49 @@ async function main() {
   });
 
   // Seed sample initial learning sessions for realistic streak & progress
-  await prisma.learningSession.createMany({
-    data: [
-      {
-        userId: user.id,
-        activityType: 'LISTENING',
-        durationMinutes: 20,
-        score: 90,
-        createdAt: new Date(Date.now() - 24 * 3600 * 1000)
-      },
-      {
-        userId: user.id,
-        activityType: 'SPEAKING',
-        durationMinutes: 30,
-        score: 85,
-        createdAt: new Date(Date.now() - 24 * 3600 * 1000)
-      },
-      {
-        userId: user.id,
-        activityType: 'VOCABULARY',
-        durationMinutes: 15,
-        score: 100,
-        createdAt: new Date(Date.now() - 24 * 3600 * 1000)
-      }
-    ]
-  });
+  const sessionCount = await prisma.learningSession.count({ where: { userId: user.id } });
+  if (sessionCount === 0) {
+    await prisma.learningSession.createMany({
+      data: [
+        {
+          userId: user.id,
+          activityType: 'LISTENING',
+          durationMinutes: 20,
+          score: 90,
+          createdAt: new Date(Date.now() - 24 * 3600 * 1000)
+        },
+        {
+          userId: user.id,
+          activityType: 'SPEAKING',
+          durationMinutes: 30,
+          score: 85,
+          createdAt: new Date(Date.now() - 24 * 3600 * 1000)
+        },
+        {
+          userId: user.id,
+          activityType: 'VOCABULARY',
+          durationMinutes: 15,
+          score: 100,
+          createdAt: new Date(Date.now() - 24 * 3600 * 1000)
+        }
+      ]
+    });
+  }
 
   // Seed an initial Journal Entry
-  await prisma.journalEntry.create({
-    data: {
-      userId: user.id,
-      title: "First Day Practicing with FluentAbroad AI",
-      content: "Hari ini saya mulai latihan berbicara bahasa Inggris lagi. Rasanya masih agak terbata-bata dan sering menerjemahkan di kepala terlebih dahulu. Tapi waktu mencoba frasa 'off the top of my head' dan 'I didn't quite catch that', percakapan terasa jauh lebih santai.",
-      difficulties: "Kadang bingung memilih kata kerja bentuk lampau saat menjelaskan proyek kuliah.",
-      newPhrases: "off the top of my head, get settled in, broaden my horizons",
-      confidenceRating: 3
-    }
-  });
+  const journalCount = await prisma.journalEntry.count({ where: { userId: user.id } });
+  if (journalCount === 0) {
+    await prisma.journalEntry.create({
+      data: {
+        userId: user.id,
+        title: "First Day Practicing with FluentAbroad AI",
+        content: "Hari ini saya mulai latihan berbicara bahasa Inggris lagi. Rasanya masih agak terbata-bata dan sering menerjemahkan di kepala terlebih dahulu. Tapi waktu mencoba frasa 'off the top of my head' dan 'I didn't quite catch that', percakapan terasa jauh lebih santai.",
+        difficulties: "Kadang bingung memilih kata kerja bentuk lampau saat menjelaskan proyek kuliah.",
+        newPhrases: "off the top of my head, get settled in, broaden my horizons",
+        confidenceRating: 3
+      }
+    });
+  }
 
   console.log('Seeding complete! FluentAbroad AI database is fully primed.');
 }
