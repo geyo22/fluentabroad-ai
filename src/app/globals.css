@@ -1,0 +1,93 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 220 20% 98%;
+    --foreground: 224 35% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 224 35% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 224 35% 12%;
+    --primary: 238 82% 59%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 220 40% 20%;
+    --muted: 220 14% 94%;
+    --muted-foreground: 220 10% 46%;
+    --accent: 239 84% 67%;
+    --accent-foreground: 224 35% 12%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 238 82% 59%;
+    --radius: 0.85rem;
+  }
+
+  .dark {
+    --background: 224 30% 9%;
+    --foreground: 210 40% 98%;
+    --card: 224 28% 12%;
+    --card-foreground: 210 40% 98%;
+    --popover: 224 28% 12%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 238 82% 65%;
+    --primary-foreground: 224 35% 10%;
+    --secondary: 224 25% 18%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 224 25% 18%;
+    --muted-foreground: 218 15% 65%;
+    --accent: 239 84% 67%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 224 20% 20%;
+    --input: 224 20% 20%;
+    --ring: 238 82% 65%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased min-h-screen selection:bg-primary/20 selection:text-primary;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+}
+
+/* Custom modern scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.25);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.4);
+}
+
+/* Pulse animation for active voice recording */
+@keyframes voice-ripple {
+  0% {
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 16px rgba(99, 102, 241, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
+  }
+}
+
+.animate-voice-ripple {
+  animation: voice-ripple 1.8s infinite;
+}
