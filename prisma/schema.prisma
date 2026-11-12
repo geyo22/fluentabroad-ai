@@ -13,7 +13,7 @@ model UserProfile {
   avatar              String?
   targetLevel         String   @default("B2")
   currentLevel        String   @default("B1")
-  targetDate          DateTime @default(dbgenerated("'2027-01-01T00:00:00.000Z'"))
+  targetDate          DateTime @default(now())
   dailyGoalMinutes    Int      @default(90)
   explanationLanguage String   @default("id") // "id" for Indonesian, "en" for English
   isOnboarded         Boolean  @default(false)
