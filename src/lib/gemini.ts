@@ -82,8 +82,15 @@ Core Behavioral Guidelines:
 12. Never fabricate the learner's performance history. Rely only on available conversation evidence.`;
 }
 
+const CANDIDATE_MODELS = [
+  "gemini-3.5-flash",
+  "gemini-3.5-flash-lite",
+  "gemini-flash-latest",
+  "gemini-3.8-flash",
+];
+
 /**
- * Send messages to Gemini speaking tutor and receive next turn
+ * Send messages to Gemini speaking tutor and receive next turn with automatic model fallback
  */
 export async function getTutorReply(
   history: ChatMessage[],
@@ -97,46 +104,48 @@ export async function getTutorReply(
     };
   }
 
-  try {
-    const genAI = new GoogleGenerativeAI(apiKey);
-    // Use gemini-1.5-flash for low latency and high quality conversational responses
-    const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash",
-      systemInstruction: buildSystemPrompt(context),
-      generationConfig: {
-        temperature: 0.7,
-        maxOutputTokens: 250,
-      },
-    });
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const formattedHistory = history.map((msg) => ({
+    role: msg.role === "user" ? "user" : "model",
+    parts: [{ text: msg.content }],
+  }));
 
-    const formattedHistory = history.map((msg) => ({
-      role: msg.role === "user" ? "user" : "model",
-      parts: [{ text: msg.content }],
-    }));
+  const lastUserMessage = formattedHistory[formattedHistory.length - 1];
+  const pastTurns = formattedHistory.slice(0, -1);
+  let lastErrorMsg = "";
 
-    // The last message is the current user message
-    const lastUserMessage = formattedHistory[formattedHistory.length - 1];
-    const pastTurns = formattedHistory.slice(0, -1);
+  for (const modelName of CANDIDATE_MODELS) {
+    try {
+      const model = genAI.getGenerativeModel({
+        model: modelName,
+        systemInstruction: buildSystemPrompt(context),
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 250,
+        },
+      });
 
-    const chat = model.startChat({
-      history: pastTurns,
-    });
+      const chat = model.startChat({
+        history: pastTurns,
+      });
 
-    const result = await chat.sendMessage(lastUserMessage.parts[0].text);
-    const responseText = result.response.text();
+      const result = await chat.sendMessage(lastUserMessage.parts[0].text);
+      const responseText = result.response.text();
 
-    return {
-      text: responseText,
-      isConfigured: true,
-    };
-  } catch (error: unknown) {
-    console.error("Gemini API Error in getTutorReply:", error);
-    const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
-    return {
-      text: `Sorry, I encountered an issue connecting to Gemini: ${errorMessage}. Please check your internet connection or API quota.`,
-      isConfigured: true,
-    };
+      return {
+        text: responseText,
+        isConfigured: true,
+      };
+    } catch (error: unknown) {
+      lastErrorMsg = error instanceof Error ? error.message : "Error connecting to model";
+      console.warn(`Model ${modelName} encountered: ${lastErrorMsg}, trying next candidate...`);
+    }
   }
+
+  return {
+    text: `Sorry, I encountered an issue connecting to Gemini: ${lastErrorMsg}. Please try again in a few moments.`,
+    isConfigured: true,
+  };
 }
 
 /**
@@ -165,7 +174,7 @@ export async function generateSessionFeedback(
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash",
+      model: "gemini-3.5-flash",
       generationConfig: {
         responseMimeType: "application/json",
         temperature: 0.3,
@@ -262,7 +271,7 @@ export async function evaluateScenarioAttemptAI(
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash",
+      model: "gemini-3.5-flash",
       generationConfig: {
         responseMimeType: "application/json",
         temperature: 0.2,
@@ -310,3 +319,267 @@ Return JSON matching:
     };
   }
 }
+
+/**
+ * Robust JSON generation helper with multi-model fallback chain
+ */
+export async function generateJSONWithModelFallback<T>(
+  prompt: string,
+  fallbackData: T,
+  temperature = 0.4
+): Promise<T> {
+  const apiKey = getGeminiApiKey();
+  if (!isGeminiConfigured() || !apiKey) {
+    return fallbackData;
+  }
+
+  const genAI = new GoogleGenerativeAI(apiKey);
+  for (const modelName of CANDIDATE_MODELS) {
+    try {
+      const model = genAI.getGenerativeModel({
+        model: modelName,
+        generationConfig: {
+          responseMimeType: "application/json",
+          temperature,
+        },
+      });
+
+      const res = await model.generateContent(prompt);
+      const text = res.response.text();
+      return JSON.parse(text) as T;
+    } catch (e) {
+      console.warn(`JSON generation on model ${modelName} failed, trying next...`, e);
+    }
+  }
+
+  return fallbackData;
+}
+
+export interface GeneratedListeningExercise {
+  title: string;
+  category: string;
+  difficulty: string;
+  audioDurationSec: number;
+  dialogue: { speaker: string; text: string; idTranslation?: string }[];
+  questions: {
+    id: string;
+    question: string;
+    options: string[];
+    correctIndex: number;
+    explanation: string;
+  }[];
+  tips: string;
+}
+
+/**
+ * Generate a brand new, unlimited realistic listening exercise with questions
+ */
+export async function generateAIListeningExercise(params: {
+  category?: string;
+  difficulty?: string;
+  customTopic?: string;
+}): Promise<GeneratedListeningExercise> {
+  const category = params.category || "SOCIAL";
+  const difficulty = params.difficulty || "B1";
+  const topicDescription = params.customTopic || `everyday real-life situation in ${category}`;
+
+  const prompt = `Generate a realistic English dialogue and 3 comprehension questions for an Indonesian university student preparing to study and live abroad.
+Category: ${category}
+CEFR Difficulty Level: ${difficulty}
+Specific Topic or Scenario: ${topicDescription}
+
+Requirements:
+1. "title": Engaging title in English (e.g. "Opening an Australian Bank Account").
+2. "category": Must be one of ["AIRPORT", "RESTAURANT", "DIRECTIONS", "ACADEMIC", "SERVICES", "SOCIAL"].
+3. "difficulty": Must be one of ["A1", "A2", "B1", "B2"].
+4. "audioDurationSec": Number (approx 40-70 seconds).
+5. "dialogue": An array of 4 to 6 dialogue turns. Each turn: { "speaker": "Alex", "text": "natural conversational English", "idTranslation": "Terjemahan bahasa Indonesia" }.
+6. "questions": Exactly 3 questions testing understanding of details, intentions, or vocabulary. Each question must have:
+   - "id": "q1", "q2", "q3"
+   - "question": Question in English
+   - "options": Exactly 4 plausible choices in English
+   - "correctIndex": Integer (0, 1, 2, or 3) indicating the correct option
+   - "explanation": Helpful explanation in Bahasa Indonesia why this option is correct.
+7. "tips": A pedagogical tip in Bahasa Indonesia about connected speech, tone, or cultural nuances in this situation.
+
+Return JSON matching this exact structure:
+{
+  "title": "string",
+  "category": "${category}",
+  "difficulty": "${difficulty}",
+  "audioDurationSec": 50,
+  "dialogue": [
+    { "speaker": "string", "text": "string", "idTranslation": "string" }
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "question": "string",
+      "options": ["string", "string", "string", "string"],
+      "correctIndex": 0,
+      "explanation": "string"
+    }
+  ],
+  "tips": "string"
+}`;
+
+  const fallback: GeneratedListeningExercise = {
+    title: `Everyday Conversation: ${category}`,
+    category,
+    difficulty,
+    audioDurationSec: 45,
+    dialogue: [
+      { speaker: "Local Resident", text: "Hi there! Welcome to the city, are you looking for the student center?", idTranslation: "Halo! Selamat datang di kota ini, apakah kamu mencari pusat mahasiswa?" },
+      { speaker: "Student", text: "Yes, exactly! Could you tell me if it's within walking distance from here?", idTranslation: "Ya, tepat sekali! Bisakah Anda memberi tahu apakah jaraknya bisa ditempuh jalan kaki dari sini?" },
+      { speaker: "Local Resident", text: "It's just two blocks down Main Street, right across from the library. You can't miss it.", idTranslation: "Hanya dua blok di Main Street, persis di seberang perpustakaan. Kamu tidak akan kelewatan." },
+      { speaker: "Student", text: "That's super helpful, thank you so much for your time!", idTranslation: "Itu sangat membantu, terima kasih banyak atas waktunya!" }
+    ],
+    questions: [
+      {
+        id: "q1",
+        question: "Where is the student center located?",
+        options: ["Across from the library", "Inside the airport terminal", "Three miles away", "Behind the train station"],
+        correctIndex: 0,
+        explanation: "Penutur lokal menyebutkan bahwa lokasi pusat mahasiswa berada persis di seberang perpustakaan (right across from the library)."
+      },
+      {
+        id: "q2",
+        question: "How far is the student center from their current location?",
+        options: ["A 30-minute bus ride", "Just two blocks down Main Street", "At the edge of the city", "Only accessible by taxi"],
+        correctIndex: 1,
+        explanation: "Penutur lokal menyatakan 'It's just two blocks down Main Street'."
+      },
+      {
+        id: "q3",
+        question: "What does 'You can't miss it' mean in this context?",
+        options: ["You will definitely get lost", "The building is very easy to spot and find", "You need a special ticket to enter", "It is closed today"],
+        correctIndex: 1,
+        explanation: "Ungkapan idiomatis 'You can't miss it' berarti tempat tersebut sangat mudah ditemukan dan terlihat jelas."
+      }
+    ],
+    tips: "Perhatikan reduksi 'two blocks down' yang diucapkan cepat dan menyatu tanpa jeda kaku."
+  };
+
+  return generateJSONWithModelFallback<GeneratedListeningExercise>(prompt, fallback, 0.4);
+}
+
+export interface GeneratedShadowingExercise {
+  category: string;
+  targetSentence: string;
+  translation: string;
+  phoneticTips: string;
+  connectedSpeechNote: string;
+}
+
+/**
+ * Generate a new authentic shadowing sentence with phonetic tips
+ */
+export async function generateAIShadowingSentence(params: {
+  category?: string;
+  customTopic?: string;
+}): Promise<GeneratedShadowingExercise> {
+  const category = params.category || "Conversational Spontaneity";
+  const prompt = `Generate a single, natural, and expressive English sentence for shadowing and pronunciation training.
+Target audience: Indonesian university student preparing to live abroad.
+Topic/Situation: ${params.customTopic || category}
+
+Requirements:
+- "category": Short category name (e.g. "Airport Navigation", "Polite Questions", "Academic Consultation")
+- "targetSentence": 12 to 20 words natural spoken English sentence containing natural connected speech (e.g. linking, elision, weak forms).
+- "translation": Natural Bahasa Indonesia translation.
+- "phoneticTips": Specific Indonesian guide on word stress, intonation contours, and troublesome vowels/consonants.
+- "connectedSpeechNote": Specific Indonesian explanation of how words link together in this sentence (e.g. /t/ linking to vowel, reduction of 'to' to /tə/).
+
+Return JSON:
+{
+  "category": "string",
+  "targetSentence": "string",
+  "translation": "string",
+  "phoneticTips": "string",
+  "connectedSpeechNote": "string"
+}`;
+
+  const fallback: GeneratedShadowingExercise = {
+    category,
+    targetSentence: "Could you please point me in the right direction for the international student advisory desk?",
+    translation: "Bisakah Anda menunjukkan arah yang tepat menuju meja konsultasi mahasiswa internasional?",
+    phoneticTips: "Beri penekanan utama pada 'point me', 'right direction', dan 'advisory desk'. Intonasi meninggi sopan pada akhir kalimat.",
+    connectedSpeechNote: "'Point me in' mengalir menyambung /pɔɪnt miː ɪn/ tanpa menghentikan nafas antar kata."
+  };
+
+  return generateJSONWithModelFallback<GeneratedShadowingExercise>(prompt, fallback, 0.4);
+}
+
+export interface GeneratedVocabItem {
+  phrase: string;
+  translation: string;
+  exampleSentence: string;
+  context: string;
+  topic: string;
+  difficulty: string;
+}
+
+/**
+ * Generate a batch of high-yield conversational phrases for SRS flashcards
+ */
+export async function generateAIVocabularyBatch(params: {
+  topic?: string;
+  count?: number;
+}): Promise<GeneratedVocabItem[]> {
+  const topic = params.topic || "Abroad Survival & Campus Life";
+  const count = params.count || 3;
+
+  const prompt = `Generate exactly ${count} natural spoken English phrases, collocations, or practical idioms for an Indonesian student preparing for university life abroad.
+Topic: ${topic}
+
+Requirements for each item:
+- "phrase": High-yield phrase (e.g. "touch base", "off the top of my head", "call it a day", "grab a bite").
+- "translation": Meaningful Indonesian translation.
+- "exampleSentence": Authentic conversational sentence demonstrating natural usage.
+- "context": When and with whom to use this phrase (e.g. "Digunakan saat diskusi tugas kelompok dengan teman kuliah").
+- "topic": "${topic}"
+- "difficulty": "Easy", "Medium", or "Hard"
+
+Return JSON array:
+[
+  {
+    "phrase": "string",
+    "translation": "string",
+    "exampleSentence": "string",
+    "context": "string",
+    "topic": "string",
+    "difficulty": "Medium"
+  }
+]`;
+
+  const fallback: GeneratedVocabItem[] = [
+    {
+      phrase: "touch base with someone",
+      translation: "menghubungi atau mengabari seseorang secara singkat",
+      exampleSentence: "Let's touch base tomorrow morning before the lecture begins.",
+      context: "Sangat umum digunakan saat berkoordinasi dengan teman kuliah atau rekan kerja.",
+      topic,
+      difficulty: "Medium"
+    },
+    {
+      phrase: "get the hang of it",
+      translation: "mulai terbiasa atau memahami cara kerja sesuatu",
+      exampleSentence: "It was confusing at first, but I am slowly getting the hang of public transit here.",
+      context: "Digunakan saat menceritakan proses adaptasi di lingkungan baru luar negeri.",
+      topic,
+      difficulty: "Easy"
+    },
+    {
+      phrase: "bear with me for a moment",
+      translation: "tolong bersabar sebentar / tunggu sejenak",
+      exampleSentence: "Please bear with me for a moment while I pull up my enrollment documents.",
+      context: "Ungkapan sopan saat mencari berkas di depan petugas imigrasi atau admin kampus.",
+      topic,
+      difficulty: "Medium"
+    }
+  ];
+
+  return generateJSONWithModelFallback<GeneratedVocabItem[]>(prompt, fallback, 0.4);
+}
+
+

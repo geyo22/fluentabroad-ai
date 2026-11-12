@@ -49,10 +49,32 @@ export default function VocabularyPage() {
   const [newTopic, setNewTopic] = useState("General");
   const [newDifficulty, setNewDifficulty] = useState("Medium");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGeneratingVocab, setIsGeneratingVocab] = useState(false);
 
   useEffect(() => {
     fetchVocabulary();
   }, [filter]);
+
+  const handleGenerateAIVocab = async () => {
+    if (isGeneratingVocab) return;
+    setIsGeneratingVocab(true);
+
+    try {
+      const res = await fetch("/api/vocabulary/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ topic: "Everyday Abroad & Campus Life", count: 3 }),
+      });
+
+      if (res.ok) {
+        fetchVocabulary();
+      }
+    } catch (e) {
+      console.error("AI vocab error:", e);
+    } finally {
+      setIsGeneratingVocab(false);
+    }
+  };
 
   const fetchVocabulary = () => {
     setLoading(true);
@@ -174,8 +196,8 @@ export default function VocabularyPage() {
         </div>
       </div>
 
-      {/* Controls & Filter Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-2xl bg-card border border-border shadow-sm">
+      {/* Controls & Filter Bar - Apple Style */}
+      <div className="flex flex-wrap items-center justify-between gap-4 p-5 rounded-3xl bg-card border border-border/80 shadow-apple">
         <div className="flex items-center gap-2">
           {["due", "all", "mastered"].map((tab) => (
             <button
@@ -184,10 +206,10 @@ export default function VocabularyPage() {
                 setFilter(tab);
                 setReviewMode(false);
               }}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold capitalize transition-all ${
+              className={`px-4 py-2 rounded-full text-xs font-semibold capitalize transition-all ${
                 filter === tab
-                  ? "bg-primary text-white shadow-sm"
-                  : "bg-muted text-muted-foreground hover:bg-muted/80"
+                  ? "bg-primary text-white shadow-xs"
+                  : "bg-muted/80 text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
             >
               {tab === "due"
@@ -199,7 +221,16 @@ export default function VocabularyPage() {
           ))}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
+          <button
+            onClick={handleGenerateAIVocab}
+            disabled={isGeneratingVocab}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 hover:bg-primary/20 text-primary text-xs font-semibold transition-all shadow-xs hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>{isGeneratingVocab ? "Menyusun Frasa..." : "Rekomendasi 3 Frasa (AI)"}</span>
+          </button>
+
           {items.length > 0 && !reviewMode && (
             <button
               onClick={() => {
@@ -207,34 +238,34 @@ export default function VocabularyPage() {
                 setCurrentReviewIdx(0);
                 setIsFlipped(false);
               }}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow transition-all"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-xs transition-all hover:scale-[1.02] active:scale-[0.98]"
             >
               <RotateCw className="w-3.5 h-3.5" />
-              <span>Mulai Sesi Review Flashcard</span>
+              <span>Review Flashcard</span>
             </button>
           )}
 
           <button
             onClick={() => setShowAddModal(true)}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-primary text-white text-xs font-bold hover:bg-primary/90 transition-all shadow"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary text-white text-xs font-semibold hover:bg-primary/90 transition-all shadow-xs hover:scale-[1.02] active:scale-[0.98]"
           >
             <Plus className="w-4 h-4" />
-            <span>Tambah Frasa Baru</span>
+            <span>Tambah Manual</span>
           </button>
         </div>
       </div>
 
-      {/* SRS Flashcard Review Mode View */}
+      {/* SRS Flashcard Review Mode View - Apple Widget Style */}
       {reviewMode && activeCard ? (
-        <div className="rounded-2xl bg-card border border-border p-8 shadow-sm space-y-6 max-w-2xl mx-auto text-center">
+        <div className="rounded-3xl bg-card border border-border/80 p-8 shadow-apple space-y-7 max-w-2xl mx-auto text-center">
           <div className="flex items-center justify-between text-xs text-muted-foreground">
-            <span>
+            <span className="font-medium">
               Kartu {currentReviewIdx + 1} dari {items.length}
             </span>
-            <span className="font-bold text-primary">{activeCard.topic}</span>
+            <span className="font-semibold px-3 py-1 rounded-full bg-primary/10 text-primary">{activeCard.topic}</span>
             <button
               onClick={() => setReviewMode(false)}
-              className="text-muted-foreground hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground transition-colors font-medium"
             >
               Keluar Sesi
             </button>
@@ -243,25 +274,25 @@ export default function VocabularyPage() {
           {/* Flashcard Body */}
           <div
             onClick={() => setIsFlipped(!isFlipped)}
-            className="min-h-[220px] rounded-2xl bg-muted/40 border border-border p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-muted/60 transition-all space-y-4"
+            className="min-h-[240px] rounded-3xl bg-muted/30 border border-border/80 p-8 flex flex-col items-center justify-center cursor-pointer hover:bg-muted/50 transition-all space-y-4"
           >
-            <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest">
+            <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-widest">
               {isFlipped ? "Arti & Contoh Kalimat" : "Klik Kartu Untuk Membalik"}
             </span>
 
             <div className="space-y-2">
-              <h2 className="text-2xl font-extrabold text-foreground">{activeCard.phrase}</h2>
-              <div className="flex justify-center">
+              <h2 className="text-2xl sm:text-3xl font-semibold text-foreground selectable-text">{activeCard.phrase}</h2>
+              <div className="flex justify-center pt-1">
                 <SpeakButton text={activeCard.phrase} size="sm" />
               </div>
             </div>
 
             {isFlipped && (
-              <div className="pt-2 border-t border-border/60 w-full space-y-2 animate-in fade-in">
-                <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
+              <div className="pt-3 border-t border-border/60 w-full space-y-2 animate-in fade-in selectable-text">
+                <p className="text-base font-semibold text-foreground">
                   {activeCard.translation}
                 </p>
-                <p className="text-xs text-muted-foreground italic">
+                <p className="text-xs text-muted-foreground italic max-w-md mx-auto">
                   "{activeCard.exampleSentence}"
                 </p>
                 {activeCard.context && (
@@ -273,32 +304,32 @@ export default function VocabularyPage() {
 
           {/* SRS Rating Action Buttons (SM-2) */}
           {isFlipped ? (
-            <div className="space-y-2">
+            <div className="space-y-3">
               <p className="text-xs font-semibold text-muted-foreground">
                 Seberapa mudah Anda mengingat frasa ini?
               </p>
-              <div className="grid grid-cols-4 gap-2">
+              <div className="grid grid-cols-4 gap-2.5">
                 <button
                   onClick={() => handleReviewRating(1)}
-                  className="p-3 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 font-bold text-xs border border-rose-500/30 transition-all"
+                  className="py-3 px-2 rounded-2xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 font-semibold text-xs border border-rose-500/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
                 >
                   Again (1 hr)
                 </button>
                 <button
                   onClick={() => handleReviewRating(2)}
-                  className="p-3 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 font-bold text-xs border border-amber-500/30 transition-all"
+                  className="py-3 px-2 rounded-2xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 font-semibold text-xs border border-amber-500/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
                 >
                   Hard (2 hr)
                 </button>
                 <button
                   onClick={() => handleReviewRating(3)}
-                  className="p-3 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 text-blue-600 font-bold text-xs border border-blue-500/30 transition-all"
+                  className="py-3 px-2 rounded-2xl bg-blue-500/10 hover:bg-blue-500/20 text-blue-600 font-semibold text-xs border border-blue-500/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
                 >
                   Good (4 hr)
                 </button>
                 <button
                   onClick={() => handleReviewRating(4)}
-                  className="p-3 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 font-bold text-xs border border-emerald-500/30 transition-all"
+                  className="py-3 px-2 rounded-2xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 font-semibold text-xs border border-emerald-500/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
                 >
                   Easy (7 hr)
                 </button>
@@ -307,7 +338,7 @@ export default function VocabularyPage() {
           ) : (
             <button
               onClick={() => setIsFlipped(true)}
-              className="px-6 py-2.5 rounded-xl bg-primary text-white text-xs font-bold shadow hover:bg-primary/90 transition-all"
+              className="px-8 py-3 rounded-full bg-primary text-white text-xs font-semibold shadow-xs hover:bg-primary/90 transition-all hover:scale-[1.02] active:scale-[0.98]"
             >
               Tampilkan Jawaban
             </button>
@@ -328,28 +359,28 @@ export default function VocabularyPage() {
             items.map((item) => (
               <div
                 key={item.id}
-                className="p-4 rounded-2xl bg-card border border-border shadow-sm hover:shadow transition-all space-y-2.5 flex flex-col justify-between"
+                className="p-4 rounded-xl bg-card border border-border shadow-sm hover:border-foreground/20 transition-all space-y-2.5 flex flex-col justify-between"
               >
                 <div>
-                  <div className="flex items-center justify-between text-[10px] font-bold">
-                    <span className="bg-primary/10 text-primary px-2 py-0.5 rounded">
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className="text-muted-foreground font-medium">
                       {item.topic}
                     </span>
-                    <span className="text-muted-foreground">
+                    <span className="text-muted-foreground text-[10px]">
                       Level Retensi: {item.masteryLevel}/5
                     </span>
                   </div>
 
                   <div className="mt-2 flex items-start justify-between gap-2">
-                    <h3 className="text-sm font-bold text-foreground leading-tight">{item.phrase}</h3>
+                    <h3 className="text-sm font-semibold text-foreground leading-tight selectable-text">{item.phrase}</h3>
                     <SpeakButton text={item.phrase} size="sm" />
                   </div>
 
-                  <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 mt-1">
+                  <p className="text-xs text-foreground/80 mt-1 selectable-text">
                     {item.translation}
                   </p>
 
-                  <p className="text-xs text-muted-foreground italic mt-1 line-clamp-2">
+                  <p className="text-xs text-muted-foreground italic mt-1 line-clamp-2 selectable-text">
                     "{item.exampleSentence}"
                   </p>
                 </div>
@@ -468,3 +499,4 @@ export default function VocabularyPage() {
     </div>
   );
 }
+

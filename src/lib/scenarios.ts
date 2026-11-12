@@ -193,3 +193,4 @@ export const SCENARIOS_CATALOG: ScenarioDef[] = [
     icon: "MessageSquareDiff",
   },
 ];
+

@@ -20,6 +20,8 @@ import {
   Info,
   ChevronRight,
   ArrowRight,
+  Plus,
+  X,
 } from "lucide-react";
 
 interface ShadowingExercise {
@@ -83,7 +85,7 @@ const SHADOWING_PRACTICE_SET: ShadowingExercise[] = [
 ];
 
 export default function ShadowingPage() {
-  const [exercises] = useState<ShadowingExercise[]>(SHADOWING_PRACTICE_SET);
+  const [exercises, setExercises] = useState<ShadowingExercise[]>(SHADOWING_PRACTICE_SET);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [spokenText, setSpokenText] = useState("");
   const [comparison, setComparison] = useState<{
@@ -92,8 +94,39 @@ export default function ShadowingPage() {
     feedbackNotes: string;
   } | null>(null);
 
+  // AI Generator state
+  const [showGenModal, setShowGenModal] = useState(false);
+  const [customTopic, setCustomTopic] = useState("");
+  const [isGenerating, setIsGenerating] = useState(false);
+
   const active = exercises[currentIndex];
   const { speak, stop, isPlaying } = useTextToSpeech();
+
+  const handleGenerateShadowing = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (isGenerating) return;
+    setIsGenerating(true);
+
+    try {
+      const res = await fetch("/api/shadowing/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ customTopic: customTopic.trim() || "Everyday Conversation Abroad" }),
+      });
+
+      if (res.ok) {
+        const newEx: ShadowingExercise = await res.json();
+        setExercises((prev) => [...prev, newEx]);
+        setCurrentIndex(exercises.length); // switch to the new one
+        setShowGenModal(false);
+        setCustomTopic("");
+      }
+    } catch (e) {
+      console.error("Shadowing generation error:", e);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   const {
     isListening,
@@ -139,10 +172,10 @@ export default function ShadowingPage() {
       />
 
       {/* Methodological Transparency Note */}
-      <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 text-xs text-blue-900 dark:text-blue-300 flex items-start gap-3">
-        <Info className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
+      <div className="p-3.5 rounded-xl bg-muted/40 border border-border text-xs text-muted-foreground flex items-start gap-2.5">
+        <Info className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
         <p className="leading-relaxed">
-          <strong>Prinsip Penilaian:</strong> Modul ini mengukur kesesuaian pengenalan kata (
+          <strong className="text-foreground font-semibold">Prinsip Penilaian:</strong> Modul ini mengukur kesesuaian pengenalan kata (
           <em>word-recognition similarity</em>) melalui transkripsi suara browser, bukan skor akustik fonemik tiruan.
           Fokuskan latihan pada ritme, intonasi, dan kelancaran mengucapkan kalimat secara utuh.
         </p>
@@ -155,29 +188,36 @@ export default function ShadowingPage() {
         </div>
       )}
 
-      {/* Main Shadowing Studio Card */}
-      <div className="rounded-2xl bg-card border border-border p-6 shadow-sm space-y-6">
+      {/* Main Shadowing Studio Card - Apple Design */}
+      <div className="rounded-3xl bg-card border border-border/80 p-6 sm:p-8 shadow-apple space-y-7">
         {/* Header with Exercise Counter & Category */}
-        <div className="flex items-center justify-between border-b border-border pb-4">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-bold bg-primary/10 text-primary px-2.5 py-1 rounded-md">
+        <div className="flex items-center justify-between border-b border-border/60 pb-4">
+          <div className="flex items-center gap-2.5">
+            <span className="text-xs font-semibold bg-primary/10 text-primary px-3 py-1 rounded-full">
               {active.category}
             </span>
-            <span className="text-xs text-muted-foreground font-semibold">
+            <span className="text-xs text-muted-foreground font-medium">
               Latihan {currentIndex + 1} dari {exercises.length}
             </span>
           </div>
 
           <div className="flex items-center gap-2">
             <button
+              onClick={() => setShowGenModal(true)}
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold hover:bg-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Buat Kalimat Baru (AI)</span>
+            </button>
+            <button
               onClick={handlePrev}
-              className="px-3 py-1 rounded-lg border border-border hover:bg-muted text-xs font-bold transition-colors"
+              className="px-3.5 py-1.5 rounded-full border border-border hover:bg-muted text-xs font-medium transition-colors"
             >
               Sebelumnya
             </button>
             <button
               onClick={handleNext}
-              className="px-3 py-1 rounded-lg bg-primary text-white text-xs font-bold hover:bg-primary/90 transition-colors"
+              className="px-4 py-1.5 rounded-full bg-primary text-white text-xs font-semibold hover:bg-primary/90 transition-all shadow-xs hover:scale-[1.02] active:scale-[0.98]"
             >
               Berikutnya →
             </button>
@@ -185,14 +225,14 @@ export default function ShadowingPage() {
         </div>
 
         {/* Step 1 & 2: Target English Sentence & Audio Playback */}
-        <div className="p-6 rounded-2xl bg-muted/30 border border-border space-y-3 text-center">
-          <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
-            Kalimat Target (Dengarkan & Tirukan):
+        <div className="p-7 sm:p-8 rounded-3xl bg-muted/30 border border-border/60 space-y-4 text-center">
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            Kalimat Target (Dengarkan & Tirukan)
           </p>
-          <h2 className="text-xl sm:text-2xl font-extrabold text-foreground tracking-tight leading-relaxed">
+          <h2 className="text-2xl sm:text-3xl font-semibold text-foreground tracking-tight leading-relaxed selectable-text">
             "{active.targetSentence}"
           </h2>
-          <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">
+          <p className="text-xs sm:text-sm text-muted-foreground font-medium selectable-text">
             Arti: {active.translation}
           </p>
 
@@ -200,11 +240,10 @@ export default function ShadowingPage() {
             <button
               type="button"
               onClick={handlePlayReference}
-              className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-white shadow transition-all ${
-                isPlaying
+              className={`inline-flex items-center gap-2 px-6 py-3 rounded-full text-xs font-semibold text-white shadow-xs transition-all hover:scale-[1.02] active:scale-[0.98] ${isPlaying
                   ? "bg-amber-500 hover:bg-amber-600 animate-pulse"
                   : "bg-primary hover:bg-primary/90"
-              }`}
+                }`}
             >
               {isPlaying ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
               <span>{isPlaying ? "Hentikan Audio Target" : "Dengarkan Audio Target (0.9x)"}</span>
@@ -213,16 +252,16 @@ export default function ShadowingPage() {
         </div>
 
         {/* Linguistic Coaching Tips */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="p-3.5 rounded-xl bg-card border border-border space-y-1">
-            <h4 className="text-xs font-bold text-primary flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5" /> Tips Artikulasi & Intonasi:
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+          <div className="p-4 rounded-xl bg-muted/30 border border-border space-y-1">
+            <h4 className="text-xs font-semibold text-foreground">
+              Artikulasi & Intonasi
             </h4>
             <p className="text-xs text-muted-foreground leading-relaxed">{active.phoneticTips}</p>
           </div>
-          <div className="p-3.5 rounded-xl bg-card border border-border space-y-1">
-            <h4 className="text-xs font-bold text-indigo-500 flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5" /> Connected Speech Flow:
+          <div className="p-4 rounded-xl bg-muted/30 border border-border space-y-1">
+            <h4 className="text-xs font-semibold text-foreground">
+              Connected Speech Flow
             </h4>
             <p className="text-xs text-muted-foreground leading-relaxed">
               {active.connectedSpeechNote}
@@ -231,8 +270,8 @@ export default function ShadowingPage() {
         </div>
 
         {/* Step 3: Record User Speech */}
-        <div className="p-6 rounded-2xl border border-primary/20 bg-primary/5 space-y-4 text-center">
-          <h3 className="text-xs font-bold text-foreground uppercase tracking-wider">
+        <div className="p-6 rounded-2xl border border-border bg-muted/20 space-y-4 text-center">
+          <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider">
             Langkah 2: Rekam Percobaan Ucapkan Anda
           </h3>
           <p className="text-xs text-muted-foreground max-w-md mx-auto">
@@ -251,11 +290,10 @@ export default function ShadowingPage() {
                   startListening();
                 }
               }}
-              className={`p-5 rounded-full shadow-lg transition-all focus:outline-none ${
-                isListening
+              className={`p-5 rounded-full shadow-lg transition-all focus:outline-none ${isListening
                   ? "bg-rose-500 text-white animate-voice-ripple scale-110"
                   : "bg-primary text-white hover:bg-primary/90"
-              }`}
+                }`}
             >
               {isListening ? <MicOff className="w-7 h-7" /> : <Mic className="w-7 h-7" />}
             </button>
@@ -285,13 +323,12 @@ export default function ShadowingPage() {
               <div className="flex items-center gap-2">
                 <span className="text-xs font-bold text-muted-foreground">Akurasi Transkrip:</span>
                 <span
-                  className={`text-base font-extrabold px-3 py-1 rounded-full ${
-                    comparison.similarityScore >= 80
+                  className={`text-base font-extrabold px-3 py-1 rounded-full ${comparison.similarityScore >= 80
                       ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
                       : comparison.similarityScore >= 50
-                      ? "bg-amber-500/15 text-amber-600 dark:text-amber-400"
-                      : "bg-rose-500/15 text-rose-600 dark:text-rose-400"
-                  }`}
+                        ? "bg-amber-500/15 text-amber-600 dark:text-amber-400"
+                        : "bg-rose-500/15 text-rose-600 dark:text-rose-400"
+                    }`}
                 >
                   {comparison.similarityScore}%
                 </span>
@@ -307,11 +344,10 @@ export default function ShadowingPage() {
                 {comparison.wordComparison.map((w, idx) => (
                   <span
                     key={idx}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold border ${
-                      w.matched
+                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold border ${w.matched
                         ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-300"
                         : "bg-rose-500/10 border-rose-500/30 text-rose-700 dark:text-rose-300 line-through"
-                    }`}
+                      }`}
                   >
                     {w.word}
                   </span>
@@ -347,6 +383,62 @@ export default function ShadowingPage() {
           </div>
         )}
       </div>
+
+      {/* AI Shadowing Sentence Generator Modal */}
+      {showGenModal && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <div className="bg-card border border-border/80 rounded-3xl w-full max-w-lg shadow-2xl p-7 space-y-5 animate-in fade-in zoom-in-95">
+            <div className="flex items-center justify-between border-b border-border/60 pb-3">
+              <div>
+                <h3 className="font-semibold text-foreground text-sm tracking-tight">
+                  Buat Kalimat Shadowing Baru (AI)
+                </h3>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Gemini AI akan membuat kalimat penutur asli beserta panduan artikulasi & connected speech.
+                </p>
+              </div>
+              <button
+                onClick={() => setShowGenModal(false)}
+                className="p-1.5 rounded-full text-muted-foreground hover:bg-muted transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleGenerateShadowing} className="space-y-4 text-xs">
+              <div className="space-y-1.5">
+                <label className="font-semibold text-foreground">Topik / Situasi Kalimat</label>
+                <input
+                  type="text"
+                  required
+                  value={customTopic}
+                  onChange={(e) => setCustomTopic(e.target.value)}
+                  placeholder="Contoh: Menanyakan rute stasiun kereta, atau memesan makanan di kafe"
+                  className="w-full p-3 rounded-full bg-muted/60 border border-border/80 focus:outline-none focus:ring-1 focus:ring-primary text-foreground placeholder:text-muted-foreground"
+                />
+              </div>
+
+              <div className="pt-2 flex justify-end gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => setShowGenModal(false)}
+                  className="px-5 py-2.5 rounded-full border border-border hover:bg-muted font-medium text-foreground transition-colors"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={isGenerating || !customTopic.trim()}
+                  className="px-6 py-2.5 rounded-full bg-primary text-white font-semibold hover:bg-primary/90 shadow-xs transition-all disabled:opacity-50 hover:scale-[1.02] active:scale-[0.98]"
+                >
+                  {isGenerating ? "Menyusun Kalimat..." : "Generate Kalimat"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+

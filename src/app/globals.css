@@ -4,48 +4,48 @@
 
 @layer base {
   :root {
-    --background: 220 20% 98%;
-    --foreground: 224 35% 12%;
+    --background: 240 5% 96%; /* #f5f5f7 Apple Light Gray */
+    --foreground: 240 6% 12%; /* #1d1d1f Apple Charcoal */
     --card: 0 0% 100%;
-    --card-foreground: 224 35% 12%;
+    --card-foreground: 240 6% 12%;
     --popover: 0 0% 100%;
-    --popover-foreground: 224 35% 12%;
-    --primary: 238 82% 59%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 220 14% 96%;
-    --secondary-foreground: 220 40% 20%;
-    --muted: 220 14% 94%;
-    --muted-foreground: 220 10% 46%;
-    --accent: 239 84% 67%;
-    --accent-foreground: 224 35% 12%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 238 82% 59%;
-    --radius: 0.85rem;
+    --popover-foreground: 240 6% 12%;
+    --primary: 211 100% 45%; /* #0071e3 Apple System Blue */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 5% 92%; /* #e8e8ed Apple Gray 100 */
+    --secondary-foreground: 240 6% 12%;
+    --muted: 240 5% 92%;
+    --muted-foreground: 240 4% 48%; /* #86868b Apple Muted Text */
+    --accent: 240 5% 92%;
+    --accent-foreground: 240 6% 12%;
+    --destructive: 0 100% 59%; /* #ff3b30 Apple System Red */
+    --destructive-foreground: 0 0% 100%;
+    --border: 240 5% 88%; /* Subtle 1px border */
+    --input: 240 5% 88%;
+    --ring: 211 100% 45%;
+    --radius: 1.25rem; /* 20px Apple standard card radius */
   }
 
   .dark {
-    --background: 224 30% 9%;
-    --foreground: 210 40% 98%;
-    --card: 224 28% 12%;
-    --card-foreground: 210 40% 98%;
-    --popover: 224 28% 12%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 238 82% 65%;
-    --primary-foreground: 224 35% 10%;
-    --secondary: 224 25% 18%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 224 25% 18%;
-    --muted-foreground: 218 15% 65%;
-    --accent: 239 84% 67%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 224 20% 20%;
-    --input: 224 20% 20%;
-    --ring: 238 82% 65%;
+    --background: 240 6% 7%; /* #121214 Apple Deep Space Dark */
+    --foreground: 240 5% 96%; /* #f5f5f7 */
+    --card: 240 4% 11%; /* #1c1c1e Apple Dark Card */
+    --card-foreground: 240 5% 96%;
+    --popover: 240 4% 11%;
+    --popover-foreground: 240 5% 96%;
+    --primary: 211 100% 52%; /* #0a84ff Apple Dark Blue */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 4% 16%;
+    --secondary-foreground: 240 5% 96%;
+    --muted: 240 4% 16%;
+    --muted-foreground: 240 4% 65%; /* #a1a1a6 */
+    --accent: 240 4% 16%;
+    --accent-foreground: 240 5% 96%;
+    --destructive: 0 100% 63%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 240 4% 18%;
+    --input: 240 4% 18%;
+    --ring: 211 100% 52%;
   }
 }
 
@@ -53,38 +53,66 @@
   * {
     @apply border-border;
   }
-  body {
-    @apply bg-background text-foreground antialiased min-h-screen selection:bg-primary/20 selection:text-primary;
-    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+
+  /* Apple signature font smoothing and layout foundation */
+  html, body {
+    @apply bg-background text-foreground min-h-screen font-sans;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    user-select: none;
+    -webkit-user-select: none;
+    cursor: default;
+    letter-spacing: -0.012em;
+  }
+
+  body, p, h1, h2, h3, h4, h5, h6, span, div, label, li, table, td, th, section, article {
+    cursor: default;
+  }
+
+  /* Allow text cursor and text selection only in inputs and editable areas */
+  input,
+  textarea,
+  [contenteditable="true"],
+  .selectable-text {
+    user-select: text;
+    -webkit-user-select: text;
+    cursor: text;
+  }
+
+  button,
+  a,
+  [role="button"],
+  select {
+    cursor: pointer;
   }
 }
 
-/* Custom modern scrollbar */
+/* Subtle, unobtrusive modern scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: hsl(var(--muted-foreground) / 0.25);
+  background: hsl(var(--muted-foreground) / 0.15);
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--muted-foreground) / 0.4);
+  background: hsl(var(--muted-foreground) / 0.3);
 }
 
-/* Pulse animation for active voice recording */
+/* Subtle voice ripple */
 @keyframes voice-ripple {
   0% {
-    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.5);
+    box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4);
   }
   70% {
-    box-shadow: 0 0 0 16px rgba(99, 102, 241, 0);
+    box-shadow: 0 0 0 12px rgba(79, 70, 229, 0);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
+    box-shadow: 0 0 0 0 rgba(79, 70, 229, 0);
   }
 }
 

@@ -71,3 +71,4 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Failed to update progress" }, { status: 500 });
   }
 }
+

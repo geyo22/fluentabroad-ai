@@ -284,3 +284,4 @@ model SkillAssessment {
 
   user               UserProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
+

@@ -72,29 +72,33 @@ export default function AnalyticsPage() {
         subtitle="Analisis objektif berbasis riwayat pembelajaran nyata, durasi aktivitas, dan laporan evaluasi AI."
       />
 
-      {/* KPI Overview Grid */}
+      {/* KPI Overview Grid - Apple Style */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="rounded-2xl bg-card border border-border p-5 shadow-sm">
+        <div className="rounded-3xl bg-card border border-border/80 p-6 shadow-apple hover:shadow-apple-hover transition-all">
           <div className="flex items-center justify-between text-xs text-muted-foreground font-semibold">
             <span>Total Waktu Belajar</span>
-            <Clock className="w-4 h-4 text-primary" />
+            <div className="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+              <Clock className="w-3.5 h-3.5" />
+            </div>
           </div>
-          <div className="mt-2">
-            <span className="text-3xl font-extrabold text-foreground">{totalMinutes}</span>
-            <span className="text-xs text-muted-foreground ml-1.5">Menit Aktif</span>
+          <div className="mt-3">
+            <span className="text-3xl font-semibold text-foreground tracking-tight">{totalMinutes}</span>
+            <span className="text-xs text-muted-foreground ml-1.5 font-normal">menit</span>
           </div>
           <p className="text-[11px] text-muted-foreground mt-1">
             ~{Math.round(totalMinutes / 60)} jam total latihan
           </p>
         </div>
 
-        <div className="rounded-2xl bg-card border border-border p-5 shadow-sm">
+        <div className="rounded-3xl bg-card border border-border/80 p-6 shadow-apple hover:shadow-apple-hover transition-all">
           <div className="flex items-center justify-between text-xs text-muted-foreground font-semibold">
             <span>Modul Kurikulum</span>
-            <Award className="w-4 h-4 text-emerald-500" />
+            <div className="w-7 h-7 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+              <Award className="w-3.5 h-3.5" />
+            </div>
           </div>
-          <div className="mt-2">
-            <span className="text-3xl font-extrabold text-foreground">
+          <div className="mt-3">
+            <span className="text-3xl font-semibold text-foreground tracking-tight">
               {completedLessonsCount}/{totalLessonsCount}
             </span>
           </div>
@@ -103,67 +107,71 @@ export default function AnalyticsPage() {
           </p>
         </div>
 
-        <div className="rounded-2xl bg-card border border-border p-5 shadow-sm">
+        <div className="rounded-3xl bg-card border border-border/80 p-6 shadow-apple hover:shadow-apple-hover transition-all">
           <div className="flex items-center justify-between text-xs text-muted-foreground font-semibold">
             <span>Skenario Lolos</span>
-            <TrendingUp className="w-4 h-4 text-indigo-500" />
+            <div className="w-7 h-7 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+              <TrendingUp className="w-3.5 h-3.5" />
+            </div>
           </div>
-          <div className="mt-2">
-            <span className="text-3xl font-extrabold text-foreground">{passedScenariosCount}</span>
-            <span className="text-xs text-muted-foreground ml-1.5">dari 15 Misi</span>
+          <div className="mt-3">
+            <span className="text-3xl font-semibold text-foreground tracking-tight">{passedScenariosCount}</span>
+            <span className="text-xs text-muted-foreground ml-1.5 font-normal">dari 15</span>
           </div>
           <p className="text-[11px] text-muted-foreground mt-1">Simulasi situasi nyata</p>
         </div>
 
-        <div className="rounded-2xl bg-card border border-border p-5 shadow-sm">
+        <div className="rounded-3xl bg-card border border-border/80 p-6 shadow-apple hover:shadow-apple-hover transition-all">
           <div className="flex items-center justify-between text-xs text-muted-foreground font-semibold">
             <span>Level Kemampuan</span>
-            <Sparkles className="w-4 h-4 text-amber-500" />
+            <div className="w-7 h-7 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+              <Sparkles className="w-3.5 h-3.5" />
+            </div>
           </div>
-          <div className="mt-2">
-            <span className="text-3xl font-extrabold text-foreground">B1 → B2</span>
+          <div className="mt-3">
+            <span className="text-3xl font-semibold text-foreground tracking-tight">B1 → B2</span>
           </div>
           <p className="text-[11px] text-muted-foreground mt-1">Target keberangkatan 2027</p>
         </div>
       </div>
 
       {/* AI Weekly Progress Report Banner */}
-      <div className="rounded-2xl bg-gradient-to-r from-primary/10 via-card to-card border border-primary/20 p-6 shadow-sm space-y-4">
-        <div className="flex items-center gap-2">
-          <Sparkles className="w-5 h-5 text-primary" />
-          <h3 className="font-bold text-foreground text-base">
-            Laporan Sintesis Mingguan Bertenaga AI
+      <div className="rounded-3xl bg-card border border-border/80 p-7 shadow-apple space-y-5">
+        <div className="flex items-center gap-2 border-b border-border/60 pb-4">
+          <Award className="w-4 h-4 text-primary" />
+          <h3 className="font-semibold text-foreground text-sm tracking-tight">
+            Laporan Sintesis Mingguan AI
           </h3>
-          <span className="text-[10px] bg-primary/20 text-primary font-bold px-2 py-0.5 rounded-full ml-auto">
-            Estimasi Berdasarkan Rekaman Nyata
+          <span className="text-[10px] text-muted-foreground font-medium ml-auto bg-muted/80 px-2.5 py-0.5 rounded-full">
+            Berdasarkan Riwayat Pembelajaran
           </span>
         </div>
 
-        <p className="text-xs text-foreground leading-relaxed">
+        <p className="text-xs sm:text-sm text-foreground/90 leading-relaxed selectable-text">
           {weeklyReport.accomplishments ||
             "Pencapaian minggu ini menunjukkan konsistensi yang baik dalam latihan terstruktur."}
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-          <div className="p-3.5 rounded-xl bg-card border border-border space-y-2">
-            <h4 className="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
-              <CheckCircle2 className="w-4 h-4" /> Kemajuan yang Terlihat (Strengths):
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+          <div className="p-4 rounded-2xl bg-muted/30 border border-border/60 space-y-2">
+            <h4 className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> Kemajuan yang Terlihat:
             </h4>
-            <ul className="space-y-1 text-xs text-muted-foreground">
+            <ul className="space-y-1.5 text-xs text-muted-foreground selectable-text">
               {weeklyReport.strengths?.map((s: string, i: number) => (
                 <li key={i} className="flex items-start gap-1.5">
-                  <span className="text-primary font-bold">•</span>
+                  <span className="text-foreground/40 font-bold">•</span>
                   <span>{s}</span>
                 </li>
               ))}
             </ul>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-card border border-border space-y-2">
-            <h4 className="text-xs font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
-              <AlertCircle className="w-4 h-4" /> Fokus Perbaikan Mendatang:
+          <div className="p-4 rounded-2xl bg-muted/30 border border-border/60 space-y-2">
+            <h4 className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+              <AlertCircle className="w-3.5 h-3.5 text-amber-600" /> Fokus Perbaikan Mendatang:
             </h4>
-            <ul className="space-y-1 text-xs text-muted-foreground">
+            <ul className="space-y-1.5 text-xs text-muted-foreground selectable-text">
               {weeklyReport.recurringDifficulties?.map((d: string, i: number) => (
                 <li key={i} className="flex items-start gap-1.5">
                   <span className="text-amber-500 font-bold">•</span>
@@ -175,8 +183,9 @@ export default function AnalyticsPage() {
         </div>
 
         {weeklyReport.recommendedFocus && (
-          <div className="p-3 rounded-xl bg-primary/5 border border-primary/10 text-xs text-primary font-medium">
-            🎯 <strong>Saran Aksi Minggu Depan:</strong> {weeklyReport.recommendedFocus}
+          <div className="p-4 rounded-2xl bg-muted/40 border border-border/60 text-xs text-foreground/80 font-medium flex items-start gap-2.5">
+            <span className="font-semibold text-foreground shrink-0">Rekomendasi Aksi:</span>
+            <span className="selectable-text">{weeklyReport.recommendedFocus}</span>
           </div>
         )}
       </div>
@@ -184,12 +193,12 @@ export default function AnalyticsPage() {
       {/* Visual Charts Grid: 7-Day Activity & Skill Breakdown */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Weekly Activity Bar Chart */}
-        <div className="rounded-2xl bg-card border border-border p-6 shadow-sm space-y-4">
+        <div className="rounded-3xl bg-card border border-border/80 p-7 shadow-apple space-y-5">
           <div>
-            <h3 className="font-bold text-foreground text-sm">
+            <h3 className="font-semibold text-foreground text-sm tracking-tight">
               Aktivitas Belajar 7 Hari Terakhir (Menit)
             </h3>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground mt-0.5">
               Rincian menit belajar harian berdasarkan jenis latihan.
             </p>
           </div>
@@ -197,31 +206,32 @@ export default function AnalyticsPage() {
           <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={weeklyChartData}>
-                <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
+                <CartesianGrid strokeDasharray="3 3" opacity={0.12} />
                 <XAxis dataKey="day" tick={{ fontSize: 11 }} />
                 <YAxis tick={{ fontSize: 11 }} />
                 <Tooltip
                   contentStyle={{
                     backgroundColor: "hsl(var(--card))",
                     borderColor: "hsl(var(--border))",
-                    borderRadius: "0.75rem",
+                    borderRadius: "1rem",
                     fontSize: "11px",
+                    boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
                   }}
                 />
                 <Legend wrapperStyle={{ fontSize: "11px", paddingTop: "8px" }} />
-                <Bar dataKey="speaking" name="Speaking" fill="#6366f1" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="listening" name="Listening" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="vocab" name="Vocabulary" fill="#10b981" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="speaking" name="Speaking" fill="#0071e3" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="listening" name="Listening" fill="#34c759" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="vocab" name="Vocabulary" fill="#ff9500" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
         {/* Skill Time Distribution */}
-        <div className="rounded-2xl bg-card border border-border p-6 shadow-sm space-y-4">
+        <div className="rounded-3xl bg-card border border-border/80 p-7 shadow-apple space-y-5">
           <div>
-            <h3 className="font-bold text-foreground text-sm">Distribusi Waktu Menurut Skill</h3>
-            <p className="text-xs text-muted-foreground">
+            <h3 className="font-semibold text-foreground text-sm tracking-tight">Distribusi Waktu Menurut Skill</h3>
+            <p className="text-xs text-muted-foreground mt-0.5">
               Alokasi total menit belajar yang telah diinvestasikan.
             </p>
           </div>
@@ -229,18 +239,19 @@ export default function AnalyticsPage() {
           <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart layout="vertical" data={skillDistribution}>
-                <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
+                <CartesianGrid strokeDasharray="3 3" opacity={0.12} />
                 <XAxis type="number" tick={{ fontSize: 11 }} />
                 <YAxis dataKey="name" type="category" width={80} tick={{ fontSize: 11 }} />
                 <Tooltip
                   contentStyle={{
                     backgroundColor: "hsl(var(--card))",
                     borderColor: "hsl(var(--border))",
-                    borderRadius: "0.75rem",
+                    borderRadius: "1rem",
                     fontSize: "11px",
+                    boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
                   }}
                 />
-                <Bar dataKey="minutes" name="Menit" fill="#8b5cf6" radius={[0, 4, 4, 0]} />
+                <Bar dataKey="minutes" name="Menit" fill="#af52de" radius={[0, 6, 6, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -248,21 +259,21 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Vocabulary Mastery Levels Bar */}
-      <div className="rounded-2xl bg-card border border-border p-6 shadow-sm space-y-4">
+      <div className="rounded-3xl bg-card border border-border/80 p-7 shadow-apple space-y-5">
         <div>
-          <h3 className="font-bold text-foreground text-sm">
+          <h3 className="font-semibold text-foreground text-sm tracking-tight">
             Status Retensi Kosa Kata (SRS Mastery Levels 0-5)
           </h3>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-muted-foreground mt-0.5">
             Level 0-2 (Memori Jangka Pendek) • Level 3-5 (Memori Jangka Panjang).
           </p>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-6 gap-3">
           {vocabBreakdown.map((vb: any, i: number) => (
-            <div key={i} className="p-3.5 rounded-xl bg-muted/40 border border-border text-center space-y-1">
-              <span className="text-[11px] font-bold text-muted-foreground">{vb.level}</span>
-              <p className="text-2xl font-extrabold text-foreground">{vb.count}</p>
+            <div key={i} className="p-4 rounded-2xl bg-muted/40 border border-border/60 text-center space-y-1">
+              <span className="text-[11px] font-semibold text-muted-foreground">{vb.level}</span>
+              <p className="text-2xl font-semibold text-foreground">{vb.count}</p>
               <span className="text-[10px] text-muted-foreground">Frasa</span>
             </div>
           ))}
@@ -271,3 +282,4 @@ export default function AnalyticsPage() {
     </div>
   );
 }
+

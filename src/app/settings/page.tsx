@@ -156,26 +156,26 @@ export default function SettingsPage() {
         </div>
       )}
 
-      {/* Gemini AI Status Card */}
-      <div className="p-5 rounded-2xl bg-card border border-border shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      {/* Gemini AI Status Card - Apple Style */}
+      <div className="p-6 rounded-3xl bg-card border border-border/80 shadow-apple flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <Key className="w-4 h-4 text-primary" />
-            <h3 className="text-sm font-bold text-foreground">Koneksi Google Gemini API</h3>
+            <h3 className="text-sm font-semibold text-foreground tracking-tight">Koneksi Google Gemini API</h3>
           </div>
-          <p className="text-xs text-muted-foreground max-w-lg">
+          <p className="text-xs text-muted-foreground max-w-lg leading-relaxed">
             Semua panggilan AI Speaking Partner dan evaluasi gramatikal diproses langsung melalui server-side Google Gemini SDK. Kunci API tidak pernah dikirim ke browser client.
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           {isGeminiReady ? (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-bold border border-emerald-500/20">
+            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-semibold border border-emerald-500/20">
               <CheckCircle2 className="w-3.5 h-3.5" />
               <span>Terhubung Aktif</span>
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 text-xs font-bold border border-amber-500/20">
+            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 text-xs font-semibold border border-amber-500/20">
               <AlertCircle className="w-3.5 h-3.5" />
               <span>Kunci Belum Diisi</span>
             </span>
@@ -185,39 +185,39 @@ export default function SettingsPage() {
 
       <form onSubmit={handleSaveSettings} className="space-y-6">
         {/* Profile & Target Goals */}
-        <div className="p-6 rounded-2xl bg-card border border-border shadow-sm space-y-4">
-          <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+        <div className="p-7 rounded-3xl bg-card border border-border/80 shadow-apple space-y-5">
+          <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
             <User className="w-4 h-4 text-primary" />
             <span>Profil Pembelajar & Target Keberangkatan</span>
           </h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <label className="font-semibold text-foreground">Nama Tampilan</label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full p-2.5 rounded-xl bg-muted/50 border border-border focus:outline-none focus:ring-1 focus:ring-primary"
+                className="w-full p-3 rounded-full bg-muted/50 border border-border/80 focus:outline-none focus:ring-1 focus:ring-primary text-foreground"
               />
             </div>
 
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <label className="font-semibold text-foreground">Tanggal Target Keberangkatan</label>
               <input
                 type="date"
                 value={targetDate}
                 onChange={(e) => setTargetDate(e.target.value)}
-                className="w-full p-2.5 rounded-xl bg-muted/50 border border-border focus:outline-none focus:ring-1 focus:ring-primary"
+                className="w-full p-3 rounded-full bg-muted/50 border border-border/80 focus:outline-none focus:ring-1 focus:ring-primary text-foreground"
               />
             </div>
 
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <label className="font-semibold text-foreground">Level Kemampuan Saat Ini</label>
               <select
                 value={currentLevel}
                 onChange={(e) => setCurrentLevel(e.target.value)}
-                className="w-full p-2.5 rounded-xl bg-muted/50 border border-border focus:outline-none focus:ring-1 focus:ring-primary"
+                className="w-full p-3 rounded-full bg-muted/50 border border-border/80 focus:outline-none focus:ring-1 focus:ring-primary text-foreground font-medium"
               >
                 <option value="A1">A1 (Beginner)</option>
                 <option value="A2">A2 (Elementary)</option>
@@ -226,12 +226,12 @@ export default function SettingsPage() {
               </select>
             </div>
 
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <label className="font-semibold text-foreground">Bahasa Penjelasan & Umpan Balik</label>
               <select
                 value={explanationLanguage}
                 onChange={(e) => setExplanationLanguage(e.target.value)}
-                className="w-full p-2.5 rounded-xl bg-muted/50 border border-border focus:outline-none focus:ring-1 focus:ring-primary"
+                className="w-full p-3 rounded-full bg-muted/50 border border-border/80 focus:outline-none focus:ring-1 focus:ring-primary text-foreground font-medium"
               >
                 <option value="id">Bahasa Indonesia</option>
                 <option value="en">English</option>
@@ -241,19 +241,19 @@ export default function SettingsPage() {
         </div>
 
         {/* Daily Time Breakdown Preferences */}
-        <div className="p-6 rounded-2xl bg-card border border-border shadow-sm space-y-4">
+        <div className="p-7 rounded-3xl bg-card border border-border/80 shadow-apple space-y-5">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
               <Volume2 className="w-4 h-4 text-primary" />
               <span>Komposisi Rencana Belajar Harian (Menit)</span>
             </h3>
-            <span className="text-xs font-bold text-primary">
+            <span className="text-xs font-semibold px-3 py-1 rounded-full bg-primary/10 text-primary">
               Total: {listeningMinutes + shadowingMinutes + speakingMinutes + vocabMinutes} Menit
             </span>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <label className="font-semibold text-foreground">Listening (mnt)</label>
               <input
                 type="number"
@@ -261,10 +261,10 @@ export default function SettingsPage() {
                 max="60"
                 value={listeningMinutes}
                 onChange={(e) => setListeningMinutes(Number(e.target.value))}
-                className="w-full p-2.5 rounded-xl bg-muted/50 border border-border"
+                className="w-full p-3 rounded-full bg-muted/50 border border-border/80 text-foreground"
               />
             </div>
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <label className="font-semibold text-foreground">Shadowing (mnt)</label>
               <input
                 type="number"
@@ -272,10 +272,10 @@ export default function SettingsPage() {
                 max="60"
                 value={shadowingMinutes}
                 onChange={(e) => setShadowingMinutes(Number(e.target.value))}
-                className="w-full p-2.5 rounded-xl bg-muted/50 border border-border"
+                className="w-full p-3 rounded-full bg-muted/50 border border-border/80 text-foreground"
               />
             </div>
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <label className="font-semibold text-foreground">Speaking (mnt)</label>
               <input
                 type="number"
@@ -283,10 +283,10 @@ export default function SettingsPage() {
                 max="60"
                 value={speakingMinutes}
                 onChange={(e) => setSpeakingMinutes(Number(e.target.value))}
-                className="w-full p-2.5 rounded-xl bg-muted/50 border border-border"
+                className="w-full p-3 rounded-full bg-muted/50 border border-border/80 text-foreground"
               />
             </div>
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <label className="font-semibold text-foreground">Vocabulary (mnt)</label>
               <input
                 type="number"
@@ -294,26 +294,26 @@ export default function SettingsPage() {
                 max="60"
                 value={vocabMinutes}
                 onChange={(e) => setVocabMinutes(Number(e.target.value))}
-                className="w-full p-2.5 rounded-xl bg-muted/50 border border-border"
+                className="w-full p-3 rounded-full bg-muted/50 border border-border/80 text-foreground"
               />
             </div>
           </div>
         </div>
 
         {/* AI Tutor Behavior Settings */}
-        <div className="p-6 rounded-2xl bg-card border border-border shadow-sm space-y-4">
-          <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+        <div className="p-7 rounded-3xl bg-card border border-border/80 shadow-apple space-y-5">
+          <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
             <BotMessageSquare className="w-4 h-4 text-primary" />
             <span>Perilaku & Gaya Berbicara AI Tutor</span>
           </h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <label className="font-semibold text-foreground">Tingkat Pendampingan AI</label>
               <select
                 value={aiDifficulty}
                 onChange={(e) => setAiDifficulty(e.target.value)}
-                className="w-full p-2.5 rounded-xl bg-muted/50 border border-border focus:outline-none"
+                className="w-full p-3 rounded-full bg-muted/50 border border-border/80 focus:outline-none text-foreground font-medium"
               >
                 <option value="adaptive">Adaptif (Menyesuaikan respon Anda)</option>
                 <option value="supportive">Supportif (Sabar & kalimat sederhana)</option>
@@ -321,14 +321,14 @@ export default function SettingsPage() {
               </select>
             </div>
 
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <label className="font-semibold text-foreground">Panjang Kalimat Respon AI</label>
               <select
                 value={aiResponseLength}
                 onChange={(e) => setAiResponseLength(e.target.value)}
-                className="w-full p-2.5 rounded-xl bg-muted/50 border border-border focus:outline-none"
+                className="w-full p-3 rounded-full bg-muted/50 border border-border/80 focus:outline-none text-foreground font-medium"
               >
-                <option value="concise">Ringkas (1-2 kalimat, fokus beri kesempatan learner)</option>
+                <option value="concise">Ringkas (1-2 kalimat, beri ruang bicara)</option>
                 <option value="medium">Sedang (2-3 kalimat dengan pertanyaan lanjutan)</option>
                 <option value="expressive">Ekspresif (Penjelasan mendalam)</option>
               </select>
@@ -339,7 +339,7 @@ export default function SettingsPage() {
         <div className="flex justify-end">
           <button
             type="submit"
-            className="px-6 py-2.5 rounded-xl bg-primary text-white text-xs font-bold hover:bg-primary/90 shadow transition-all"
+            className="px-7 py-3 rounded-full bg-primary text-white text-xs font-semibold hover:bg-primary/90 shadow-xs transition-all hover:scale-[1.02] active:scale-[0.98]"
           >
             Simpan Perubahan
           </button>
@@ -347,8 +347,8 @@ export default function SettingsPage() {
       </form>
 
       {/* Data Management & Destructive Controls */}
-      <div className="p-6 rounded-2xl bg-card border border-border shadow-sm space-y-4">
-        <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+      <div className="p-7 rounded-3xl bg-card border border-border/80 shadow-apple space-y-5">
+        <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
           <Download className="w-4 h-4 text-primary" />
           <span>Cadangan & Manajemen Data Pembelajaran</span>
         </h3>
@@ -357,7 +357,7 @@ export default function SettingsPage() {
           <button
             type="button"
             onClick={handleExportJSON}
-            className="px-4 py-2 rounded-xl bg-muted hover:bg-muted/80 text-foreground text-xs font-bold flex items-center gap-2 transition-colors"
+            className="px-5 py-2.5 rounded-full bg-muted/80 hover:bg-muted text-foreground text-xs font-semibold flex items-center gap-2 transition-colors"
           >
             <Download className="w-3.5 h-3.5 text-primary" />
             <span>Ekspor Semua Data (JSON)</span>
@@ -368,7 +368,7 @@ export default function SettingsPage() {
             onClick={() =>
               handleAction("reset_progress", "Apakah Anda yakin ingin mereset progres modul dan sesi belajar?")
             }
-            className="px-4 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-bold flex items-center gap-2 transition-colors"
+            className="px-5 py-2.5 rounded-full bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-semibold flex items-center gap-2 transition-colors"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span>Reset Progres Belajar</span>
@@ -379,7 +379,7 @@ export default function SettingsPage() {
             onClick={() =>
               handleAction("clear_conversations", "Hapus semua riwayat percakapan dengan AI Speaking Partner?")
             }
-            className="px-4 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-bold flex items-center gap-2 transition-colors"
+            className="px-5 py-2.5 rounded-full bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-semibold flex items-center gap-2 transition-colors"
           >
             <Trash2 className="w-3.5 h-3.5" />
             <span>Hapus Riwayat Percakapan</span>
@@ -389,3 +389,4 @@ export default function SettingsPage() {
     </div>
   );
 }
+

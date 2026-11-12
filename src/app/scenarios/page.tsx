@@ -177,8 +177,8 @@ export default function ScenariosPage() {
         subtitle="15 skenario interaktif yang mensimulasikan situasi kritis saat bepergian dan menetap di luar negeri."
       />
 
-      {/* Scenarios Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      {/* Scenarios Grid - Apple Card Layout */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {loading ? (
           <div className="col-span-full p-12 text-center text-xs text-muted-foreground">
             Memuat skenario simulasi...
@@ -189,25 +189,25 @@ export default function ScenariosPage() {
             return (
               <div
                 key={sc.id}
-                className="p-5 rounded-2xl bg-card border border-border shadow-sm hover:shadow transition-all space-y-4 flex flex-col justify-between"
+                className="p-6 rounded-3xl bg-card border border-border/80 shadow-apple hover:shadow-apple-hover transition-all space-y-5 flex flex-col justify-between"
               >
-                <div className="space-y-2.5">
+                <div className="space-y-3">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="font-bold text-primary">Skenario #{idx + 1}</span>
-                    <span className="bg-muted text-muted-foreground px-2 py-0.5 rounded text-[11px] font-semibold">
+                    <span className="font-semibold text-primary">Skenario #{idx + 1}</span>
+                    <span className="bg-muted/80 text-muted-foreground px-2.5 py-0.5 rounded-full text-[11px] font-semibold">
                       Level {sc.difficulty}
                     </span>
                   </div>
 
-                  <h3 className="text-base font-bold text-foreground leading-snug">{sc.title}</h3>
-                  <p className="text-xs text-muted-foreground line-clamp-2">{sc.objective}</p>
+                  <h3 className="text-base font-semibold text-foreground tracking-tight leading-snug">{sc.title}</h3>
+                  <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">{sc.objective}</p>
 
-                  <div className="pt-2 border-t border-border space-y-1 text-[11px] text-muted-foreground">
+                  <div className="pt-2 border-t border-border/60 space-y-1 text-[11px] text-muted-foreground">
                     <p>
-                      <strong>Lokasi:</strong> {sc.setting}
+                      <span className="text-foreground font-semibold">Lokasi:</span> {sc.setting}
                     </p>
                     <p>
-                      <strong>Peran AI:</strong> {sc.aiRole}
+                      <span className="text-foreground font-semibold">Peran AI:</span> {sc.aiRole}
                     </p>
                   </div>
 
@@ -216,7 +216,7 @@ export default function ScenariosPage() {
                     {sc.keyPhrases.slice(0, 3).map((kp, kIdx) => (
                       <span
                         key={kIdx}
-                        className="text-[10px] bg-muted/60 text-foreground px-2 py-0.5 rounded-md font-mono"
+                        className="text-[10px] bg-muted/80 text-muted-foreground px-2.5 py-0.5 rounded-full font-mono"
                       >
                         {kp}
                       </span>
@@ -224,10 +224,10 @@ export default function ScenariosPage() {
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-border flex items-center justify-between">
+                <div className="pt-3 border-t border-border/60 flex items-center justify-between">
                   {sc.lastAttempt ? (
                     <span
-                      className={`text-xs font-bold flex items-center gap-1 ${
+                      className={`text-xs font-semibold flex items-center gap-1.5 ${
                         hasPassed
                           ? "text-emerald-600 dark:text-emerald-400"
                           : "text-amber-600 dark:text-amber-400"
@@ -244,12 +244,12 @@ export default function ScenariosPage() {
                       )}
                     </span>
                   ) : (
-                    <span className="text-[11px] text-muted-foreground">Belum dicoba</span>
+                    <span className="text-[11px] text-muted-foreground font-medium">Belum dicoba</span>
                   )}
 
                   <button
                     onClick={() => handleStartScenario(sc)}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary text-white text-xs font-bold hover:bg-primary/90 transition-all shadow"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-primary text-white text-xs font-semibold hover:bg-primary/90 transition-all shadow-xs hover:scale-[1.02] active:scale-[0.98]"
                   >
                     <Play className="w-3 h-3 fill-white" />
                     <span>Mulai Simulasi</span>
@@ -261,19 +261,19 @@ export default function ScenariosPage() {
         )}
       </div>
 
-      {/* Interactive Simulation Modal */}
+      {/* Interactive Simulation Modal - Apple Sheet Style */}
       {activeScenario && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-card border border-border rounded-2xl w-full max-w-2xl max-h-[88vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <div className="bg-card border border-border/80 rounded-3xl w-full max-w-2xl max-h-[88vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95">
             {/* Modal Header */}
-            <div className="px-6 py-4 border-b border-border flex items-center justify-between">
+            <div className="px-6 py-5 border-b border-border/80 flex items-center justify-between">
               <div>
-                <span className="text-xs font-bold text-primary">Simulasi Skenario Abroad</span>
-                <h3 className="text-base font-bold text-foreground">{activeScenario.title}</h3>
+                <span className="text-xs font-semibold text-primary">Simulasi Skenario Abroad</span>
+                <h3 className="text-base font-semibold text-foreground tracking-tight">{activeScenario.title}</h3>
               </div>
               <button
                 onClick={() => setActiveScenario(null)}
-                className="p-1.5 rounded-lg text-muted-foreground hover:bg-muted"
+                className="p-1.5 rounded-full text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -325,17 +325,17 @@ export default function ScenariosPage() {
               <div className="p-4 border-t border-border bg-card space-y-2 text-xs">
                 <div className="flex items-center justify-between">
                   <span
-                    className={`font-bold text-sm ${
+                    className={`font-semibold text-sm ${
                       evaluation.objectiveMet ? "text-emerald-600" : "text-amber-600"
                     }`}
                   >
-                    {evaluation.objectiveMet ? "Misi Berhasil Terpenuhi! 🎉" : "Perlu Latihan Tambahan"}
+                    {evaluation.objectiveMet ? "Misi Berhasil Terpenuhi" : "Perlu Latihan Tambahan"}
                   </span>
-                  <span className="font-extrabold text-sm text-foreground">
+                  <span className="font-bold text-sm text-foreground">
                     Skor: {evaluation.score}/100
                   </span>
                 </div>
-                <p className="text-muted-foreground">{evaluation.feedback}</p>
+                <p className="text-muted-foreground selectable-text">{evaluation.feedback}</p>
               </div>
             )}
 
@@ -390,3 +390,4 @@ export default function ScenariosPage() {
     </div>
   );
 }
+

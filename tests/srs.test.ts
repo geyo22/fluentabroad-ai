@@ -125,3 +125,4 @@ describe("Progress & Scoring Calculation Rules", () => {
     expect(estimateLevel(30)).toBe("A1");
   });
 });
+

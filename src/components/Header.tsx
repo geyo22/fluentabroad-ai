@@ -2,7 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { Flame, Clock, BotMessageSquare, Sparkles } from "lucide-react";
+import { Flame, Clock, BotMessageSquare, PanelLeftOpen } from "lucide-react";
+import { useSidebar } from "./SidebarContext";
 
 interface UserStats {
   currentLevel: string;
@@ -13,6 +14,16 @@ interface UserStats {
 }
 
 export function Header({ title, subtitle }: { title?: string; subtitle?: string }) {
+  let collapsed = false;
+  let toggleCollapsed = () => {};
+  try {
+    const sidebar = useSidebar();
+    collapsed = sidebar.collapsed;
+    toggleCollapsed = sidebar.toggleCollapsed;
+  } catch {
+    // fallback if rendered outside provider
+  }
+
   const [stats, setStats] = useState<UserStats>({
     currentLevel: "B1",
     targetLevel: "B2",
@@ -22,7 +33,6 @@ export function Header({ title, subtitle }: { title?: string; subtitle?: string 
   });
 
   useEffect(() => {
-    // Fetch live user stats from API
     fetch("/api/stats")
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
@@ -30,9 +40,7 @@ export function Header({ title, subtitle }: { title?: string; subtitle?: string 
           setStats((prev) => ({ ...prev, ...data }));
         }
       })
-      .catch(() => {
-        // Fallback to initial defaults if offline
-      });
+      .catch(() => {});
   }, []);
 
   const progressPercent = Math.min(
@@ -41,52 +49,57 @@ export function Header({ title, subtitle }: { title?: string; subtitle?: string 
   );
 
   return (
-    <header className="bg-card/80 backdrop-blur-md border-b border-border sticky top-0 z-30 px-6 py-4 flex flex-wrap items-center justify-between gap-4">
-      <div>
-        {title && <h1 className="text-xl font-bold text-foreground tracking-tight">{title}</h1>}
-        {subtitle && <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>}
+    <header className="bg-card/80 backdrop-blur-xl border-b border-border sticky top-0 z-30 px-6 py-3.5 flex flex-wrap items-center justify-between gap-4 transition-colors">
+      <div className="flex items-center gap-3 min-w-0">
+        {collapsed && (
+          <button
+            onClick={toggleCollapsed}
+            className="hidden lg:flex p-2 rounded-full bg-muted/80 hover:bg-muted text-muted-foreground hover:text-foreground transition-all shadow-xs"
+            title="Buka Sidebar (Ctrl+B)"
+            aria-label="Buka Sidebar"
+          >
+            <PanelLeftOpen className="w-4 h-4" />
+          </button>
+        )}
+        <div className="min-w-0">
+          {title && <h1 className="text-xl font-semibold text-foreground tracking-tight truncate">{title}</h1>}
+          {subtitle && <p className="text-xs text-muted-foreground mt-0.5 truncate">{subtitle}</p>}
+        </div>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2">
         {/* Streak Counter */}
-        <div
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-xs font-semibold"
-          title={`${stats.streakDays} hari latihan berturut-turut!`}
-        >
-          <Flame className="w-4 h-4 text-amber-500 fill-amber-500 animate-bounce" />
-          <span>{stats.streakDays} Hari Streak</span>
+        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-muted/80 text-foreground text-xs font-medium">
+          <Flame className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+          <span>{stats.streakDays} hari streak</span>
         </div>
 
         {/* Daily Time Widget */}
-        <div
-          className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted/80 border border-border text-xs font-medium text-foreground"
-          title={`Waktu belajar hari ini: ${stats.todayMinutes} dari target ${stats.dailyGoalMinutes} menit`}
-        >
-          <Clock className="w-3.5 h-3.5 text-primary" />
+        <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full bg-muted/80 text-xs font-medium text-muted-foreground">
+          <Clock className="w-3.5 h-3.5" />
           <span>
             {stats.todayMinutes}/{stats.dailyGoalMinutes} mnt
           </span>
-          <div className="w-12 h-1.5 bg-muted rounded-full overflow-hidden ml-1">
+          <div className="w-12 h-1.5 bg-border rounded-full overflow-hidden">
             <div
-              className="h-full bg-emerald-500 rounded-full transition-all duration-500"
+              className="h-full bg-primary rounded-full transition-all duration-300"
               style={{ width: `${progressPercent}%` }}
             />
           </div>
         </div>
 
         {/* Level Badge */}
-        <div className="px-2.5 py-1 rounded-lg bg-primary/10 border border-primary/20 text-primary text-xs font-bold">
+        <div className="px-2.5 py-1 rounded-full bg-muted/80 text-foreground text-xs font-semibold">
           {stats.currentLevel} → {stats.targetLevel}
         </div>
 
         {/* Quick Speak Button */}
         <Link
           href="/speaking-partner"
-          className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-primary hover:bg-primary/90 text-white text-xs font-semibold shadow-sm transition-all hover:shadow"
+          className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-primary text-white text-xs font-medium hover:bg-primary/90 transition-all shadow-xs hover:scale-[1.02] active:scale-[0.98]"
         >
           <BotMessageSquare className="w-3.5 h-3.5" />
-          <span className="hidden md:inline">Bicara dengan AI</span>
-          <Sparkles className="w-3 h-3 text-amber-300" />
+          <span>Bicara AI</span>
         </Link>
       </div>
     </header>

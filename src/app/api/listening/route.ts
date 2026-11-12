@@ -103,3 +103,4 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Failed to submit attempt" }, { status: 500 });
   }
 }
+

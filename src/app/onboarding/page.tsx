@@ -99,27 +99,29 @@ export default function OnboardingPage() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col justify-center py-10 px-4 sm:px-6">
-      <div className="max-w-2xl mx-auto w-full bg-card border border-border rounded-2xl shadow-xl overflow-hidden p-6 sm:p-8 space-y-6">
+      <div className="max-w-2xl mx-auto w-full bg-card border border-border/80 rounded-3xl shadow-apple overflow-hidden p-6 sm:p-9 space-y-7">
         {/* Progress Dots */}
-        <div className="flex items-center justify-between border-b border-border pb-4">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-primary text-white flex items-center justify-center font-bold text-sm">
+        <div className="flex items-center justify-between border-b border-border/60 pb-4">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-primary text-white flex items-center justify-center font-bold text-sm shadow-xs">
               FA
             </div>
             <div>
-              <h1 className="text-sm font-bold text-foreground">FluentAbroad AI</h1>
+              <h1 className="text-sm font-semibold text-foreground tracking-tight">FluentAbroad AI</h1>
               <p className="text-[10px] text-muted-foreground">Placement & Baseline Onboarding</p>
             </div>
           </div>
-          <span className="text-xs font-bold text-primary">Langkah {step} dari 6</span>
+          <span className="text-xs font-semibold px-3 py-1 rounded-full bg-primary/10 text-primary">
+            Langkah {step} dari 6
+          </span>
         </div>
 
         {/* STEP 1: GOALS & TIMELINE */}
         {step === 1 && (
           <div className="space-y-5 animate-in fade-in">
             <div className="space-y-1">
-              <h2 className="text-xl font-extrabold text-foreground">
-                Selamat Datang! Mari Atur Rencana Belajar Anda 🎓
+              <h2 className="text-xl font-bold text-foreground">
+                Selamat Datang! Mari Atur Rencana Belajar Anda
               </h2>
               <p className="text-xs text-muted-foreground">
                 Tentukan target keberangkatan ke luar negeri dan waktu harian yang ingin Anda investasikan.
@@ -170,22 +172,20 @@ export default function OnboardingPage() {
                   <button
                     type="button"
                     onClick={() => setExplanationLanguage("id")}
-                    className={`p-3 rounded-xl border font-bold text-center transition-all ${
-                      explanationLanguage === "id"
+                    className={`p-3 rounded-xl border font-bold text-center transition-all ${explanationLanguage === "id"
                         ? "bg-primary text-white border-primary"
                         : "bg-muted text-muted-foreground"
-                    }`}
+                      }`}
                   >
                     Bahasa Indonesia
                   </button>
                   <button
                     type="button"
                     onClick={() => setExplanationLanguage("en")}
-                    className={`p-3 rounded-xl border font-bold text-center transition-all ${
-                      explanationLanguage === "en"
+                    className={`p-3 rounded-xl border font-bold text-center transition-all ${explanationLanguage === "en"
                         ? "bg-primary text-white border-primary"
                         : "bg-muted text-muted-foreground"
-                    }`}
+                      }`}
                   >
                     English Only
                   </button>
@@ -241,11 +241,10 @@ export default function OnboardingPage() {
                   key={i}
                   type="button"
                   onClick={() => setListeningAnswer(i)}
-                  className={`w-full p-3 rounded-xl border text-left font-medium transition-all ${
-                    listeningAnswer === i
+                  className={`w-full p-3 rounded-xl border text-left font-medium transition-all ${listeningAnswer === i
                       ? "bg-primary text-white border-primary font-bold shadow-sm"
                       : "bg-card border-border hover:bg-muted/50 text-foreground"
-                  }`}
+                    }`}
                 >
                   {opt}
                 </button>
@@ -291,11 +290,10 @@ export default function OnboardingPage() {
               <button
                 type="button"
                 onClick={() => (isListening ? stopListening() : startListening())}
-                className={`p-4 rounded-full shadow-lg transition-all ${
-                  isListening
+                className={`p-4 rounded-full shadow-lg transition-all ${isListening
                     ? "bg-rose-500 text-white animate-voice-ripple"
                     : "bg-primary text-white hover:bg-primary/90"
-                }`}
+                  }`}
               >
                 {isListening ? <MicOff className="w-6 h-6" /> : <Mic className="w-6 h-6" />}
               </button>
@@ -355,11 +353,10 @@ export default function OnboardingPage() {
                   key={i}
                   type="button"
                   onClick={() => setVocabAnswer(i)}
-                  className={`w-full p-3.5 rounded-xl border text-left font-medium transition-all ${
-                    vocabAnswer === i
+                  className={`w-full p-3.5 rounded-xl border text-left font-medium transition-all ${vocabAnswer === i
                       ? "bg-primary text-white border-primary font-bold shadow-sm"
                       : "bg-card border-border hover:bg-muted/50 text-foreground"
-                  }`}
+                    }`}
                 >
                   {opt}
                 </button>
@@ -406,11 +403,10 @@ export default function OnboardingPage() {
                   key={i}
                   type="button"
                   onClick={() => setCommAnswer(i)}
-                  className={`w-full p-3.5 rounded-xl border text-left font-medium transition-all ${
-                    commAnswer === i
+                  className={`w-full p-3.5 rounded-xl border text-left font-medium transition-all ${commAnswer === i
                       ? "bg-primary text-white border-primary font-bold shadow-sm"
                       : "bg-card border-border hover:bg-muted/50 text-foreground"
-                  }`}
+                    }`}
                 >
                   {opt}
                 </button>
@@ -427,9 +423,9 @@ export default function OnboardingPage() {
               <button
                 onClick={handleFinishAssessment}
                 disabled={commAnswer === null || isSubmitting}
-                className="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow transition-all disabled:opacity-40"
+                className="px-6 py-2.5 rounded-xl bg-primary hover:bg-primary/90 text-white text-xs font-semibold shadow-sm transition-all disabled:opacity-40"
               >
-                {isSubmitting ? "Menghitung Hasil..." : "Selesaikan Tes & Lihat Hasil 🎉"}
+                {isSubmitting ? "Menghitung Hasil..." : "Selesaikan Tes & Lihat Hasil"}
               </button>
             </div>
           </div>
@@ -484,3 +480,4 @@ export default function OnboardingPage() {
     </div>
   );
 }
+
